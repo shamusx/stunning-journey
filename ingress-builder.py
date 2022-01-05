@@ -3,6 +3,7 @@ import argparse
 import base64
 import os
 import re
+import time
 
 import jinja2
 import petname
@@ -23,6 +24,7 @@ class Build_Resources(object):
         file_loader = jinja2.FileSystemLoader('./templates')
         env = jinja2.Environment(loader=file_loader)
         template = env.get_template(self.template_name)
+        final_output = ''
 
         for name in self.host_list:
             appcert,appkey = self.buildAppCert(name)
@@ -32,10 +34,14 @@ class Build_Resources(object):
             output = template.render(name=name,domain=self.domain,image_name=self.image_name,
                                      cert=appcert.decode("utf-8"), key=appkey.decode("utf-8"),
                                      namespace=self.namespace)
-            print(output)
+            # print(output)
+            final_output += output
+        timestamp = time.strftime("%Y%m%d%H%M%S")
+        f = open('%s/manifest-%s.yml' % (self.folder, timestamp), "w")
+        f.write(final_output)
 
     def buildAppCert(self,name):
-        ca = CertificateAuthority(ca_storage=args.folder, common_name="LAB")
+        ca = CertificateAuthority(ca_storage=self.folder, common_name="LAB")
         output = ca.issue_certificate(name+'.'+self.domain, dns_names=[name+'.'+self.domain])
         return(output.cert_bytes, output.key_bytes)
 
