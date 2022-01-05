@@ -43,11 +43,11 @@ if __name__ == "__main__":
     templates_path = './templates'
 
     parser = argparse.ArgumentParser(description='build ingress/route resources')
-    parser.add_argument("--domain", default='fe.lab')
+    parser.add_argument("--domain", default='fe.lab', help="change domain from the default")
     parser.add_argument('--folder', default='k8slab', help="Location to store certs and ca")
-    parser.add_argument("--image", dest='image_name', default='gcr.io/kuar-demo/kuard-amd64:3')
-    parser.add_argument("--count", type=int, default=5)
-    parser.add_argument("--namespace", default="default")
+    parser.add_argument("--image", dest='image_name', default='gcr.io/kuar-demo/kuard-amd64:3', help="change image used")
+    parser.add_argument("--count", type=int, default=5, help="Number of Deployments/Ingress to create")
+    parser.add_argument("--namespace", default="default", help="Use specific namespace")
     args = parser.parse_args()
 
     files = os.listdir(templates_path)
