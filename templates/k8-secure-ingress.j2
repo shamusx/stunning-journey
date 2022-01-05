@@ -1,0 +1,69 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ name }}
+  name: {{ name }}.{{ domain }}
+  namespace: {{ namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ name }}
+  template:
+    metadata:
+      labels:
+        app: {{ name }}
+    spec:
+      containers:
+      - image: {{ image_name }}
+        name: {{ name }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ name }}
+  name: {{ name }}
+  namespace: {{ namespace }}
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: {{ name }}
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ name }}
+  namespace: {{ namespace }}
+data:
+  tls.crt: {{ cert }}
+  tls.key: {{ key }}
+type: kubernetes.io/tls
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ name }}.{{ domain }}
+  namespace: {{ namespace }}
+spec:
+  tls:
+  - hosts:
+      - {{ name }}.{{ domain }}
+    secretName: {{ name }}
+  rules:
+  - host: {{ name }}.{{ domain }}
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: {{ name }}
+            port:
+              number: 80

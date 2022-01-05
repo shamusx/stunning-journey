@@ -1,0 +1,55 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ name }}
+  name: {{ name }}.{{ domain }}
+  namespace: {{ namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ name }}
+  template:
+    metadata:
+      labels:
+        app: {{ name }}
+    spec:
+      containers:
+      - image: {{ image_name }}
+        name: {{ name }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ name }}
+  name: {{ name }}
+  namespace: {{ namespace }}
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: {{ name }}
+  type: ClusterIP
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ name }}.{{ domain }}
+  namespace: {{ namespace }}
+spec:
+  host: {{ name }}.{{ domain }}
+  to:
+    kind: Service
+    name: {{ name }}
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+    key: |-
+      {{ key | indent( width=6 )}}
+    certificate: |-
+      {{ cert | indent( width=6 )}}
