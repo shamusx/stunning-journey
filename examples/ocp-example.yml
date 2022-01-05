@@ -1,0 +1,203 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: picked-fish
+  name: picked-fish.fe.lab
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: picked-fish
+  template:
+    metadata:
+      labels:
+        app: picked-fish
+    spec:
+      containers:
+      - image: gcr.io/kuar-demo/kuard-amd64:3
+        name: picked-fish
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: picked-fish
+  name: picked-fish
+  namespace: default
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: picked-fish
+  type: ClusterIP
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: picked-fish.fe.lab
+  namespace: default
+spec:
+  host: picked-fish.fe.lab
+  to:
+    kind: Service
+    name: picked-fish
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Allow
+    key: |-
+      -----BEGIN PRIVATE KEY-----
+      MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCqUpgvoD6mXAD5
+      mGO0TzfI8F+USpYNbwvTYS+zjdJo3IeEdE2bgCeHDMhbfWpXFE/iLCz6HC2U9cy5
+      FRCkP0njY0IeBnmUsKMnYgQTsvVlzsIOVk7fWC9SMW1MkqJ0R5hAeYpYk07ZjkQg
+      JhXqdNJT5vbAMejJYYfi0r/CzUPuhX7q5442FMyftpn3xQ6yOsAbyZWMRd3GWAJS
+      UtAB0FtV4NWb78HBMwoFxMwEZyEKf+1BsjsRj55JBanPjpmEB9PJ5x/845ALru/l
+      soIbpdSqDUBho5jy9rv9zT0AkBCjz9VbkfdYy57SWYbtm7nidnmbTTzj/9rkjtVs
+      m0rgT2VbAgMBAAECggEAbiVHwdTxbwgkoUUJhXuNaeb5CJ9LdpiPnz1EaeuXXLTw
+      9pl37s3rwgxkLbZnZLUADBXhaEV8vM5QfIjA4FcFY4W3Jk+tpJiuijN6y3p59ELH
+      gBoUm58dyxunwVM6t9PtBBUVgL6SyWKVb+zxU1QFCLlebWBZWJI4HFmKJWI1QjQI
+      i9MlnKkycJ+Qz2N8MFqX8ztnjOLVrf4fvnDlEPVVh6rtr2puFwP+Cd7F5WQHhXuB
+      HGFyaFiMfc7VH7Zm5OI9GsorytYz8FgZ8ufPAMHd02i0XUqAQcRsh+wl+rGZgdXK
+      Ye7Ap1C1ioQ34XjJAkQkjv9oact9x7VTf6XEwKt5wQKBgQDTodlJ83dv/Z2GYXeS
+      JyPuzj1+fz5DRT1fHCyYMc1lyPAAsNvF5maeNObXEJUI6mEUjfG19MNYEPL5+Q35
+      peTy57n3+q1YsYZOpWsAgIgr0Z0R/i+wQnpTApKf3LIDx7ruyoTlBtKn1/ol4Sme
+      qO2DrmxJwIDmVwhfEhxgOjKJawKBgQDOB7CAG9GqCOEx8J2PLC3gq6Wck3XV6WWl
+      yAGwc0dIu0Rfew3QSIavgRsiaSXeISQiW7eizs/YWASn2W3Ga9W4QA8h6fdOzzUY
+      ZV5ERPCPJG8elkt3QD2yqKqBQ9v+zSFOXWM2/ALE31NYK9bU3Gko1pDoQkQKb4W+
+      BZXtf0vf0QKBgQDAqfSWFVbjloClCPCBFq7oxctH8PEu7sb7Yjva5mP2SOLtzhSV
+      6rX7S2/n1MnJDw8IVlz5aHW6I9v/5FNrtjJjTMCJ2CWdvCfoS0HJeDn/olmbOswR
+      a8PO9GWlsZZCSL+OisJHelmmwcGSYJSyQ1nPaqhc0CrJB+ywGF3K4NCHNwKBgQCd
+      yiXS93tLziEqLi19SUiZmNvtXsIQYgAHR3aDvMYLXeCvf37E1cbRAv/VCtKFnLwf
+      1D5/4gQsnLx0EIGSRWQZCHaOcrGFGgx/8qKPhnz2I+E2e8SwP/MAsUxkU6RZMKEh
+      c0RZCAjW3nLmRCz0ORoQvMOeHaIem+rB7WU1zxg9AQKBgA335+ZShqH0769hgzyw
+      DfZkIZ+Gc5mE7WTCcP+Us0Gkj/mrpyqGFAktaF2CMR5WRUSQcamqiffaIBD2KV8H
+      T+0HzsIayL00NrQozNznNcuclpX/81WRXRy/frYqX+e+Fp4yMOwVz1UnIeNl0yUU
+      6i9xz/Jua53EE5nTT3HWn5J2
+      -----END PRIVATE KEY-----
+
+    certificate: |-
+      -----BEGIN CERTIFICATE-----
+      MIIDGDCCAgCgAwIBAgIQEJX2IIMnTYmdZnGVIgQFqDANBgkqhkiG9w0BAQsFADAO
+      MQwwCgYDVQQDDANMQUIwHhcNMjIwMTA0MTEyNTU0WhcNMjQwNDA5MTEyNTU0WjAd
+      MRswGQYDVQQDDBJwaWNrZWQtZmlzaC5mZS5sYWIwggEiMA0GCSqGSIb3DQEBAQUA
+      A4IBDwAwggEKAoIBAQCqUpgvoD6mXAD5mGO0TzfI8F+USpYNbwvTYS+zjdJo3IeE
+      dE2bgCeHDMhbfWpXFE/iLCz6HC2U9cy5FRCkP0njY0IeBnmUsKMnYgQTsvVlzsIO
+      Vk7fWC9SMW1MkqJ0R5hAeYpYk07ZjkQgJhXqdNJT5vbAMejJYYfi0r/CzUPuhX7q
+      5442FMyftpn3xQ6yOsAbyZWMRd3GWAJSUtAB0FtV4NWb78HBMwoFxMwEZyEKf+1B
+      sjsRj55JBanPjpmEB9PJ5x/845ALru/lsoIbpdSqDUBho5jy9rv9zT0AkBCjz9Vb
+      kfdYy57SWYbtm7nidnmbTTzj/9rkjtVsm0rgT2VbAgMBAAGjYzBhMB0GA1UdEQQW
+      MBSCEnBpY2tlZC1maXNoLmZlLmxhYjAOBgNVHQ8BAf8EBAMCBeAwDwYDVR0TAQH/
+      BAUwAwEB/zAfBgNVHSMEGDAWgBScm7ZUe+ihUencZjIcjir4ez0+UTANBgkqhkiG
+      9w0BAQsFAAOCAQEABpVWUzRSPBimRaWrkwAWIY1EVVICKQiKTJPir99nD0+w9DwW
+      U9hQnVHkbDSW0iRBa7q24uPgZAQrranHS04R/bybt2vPD01/CDn5Ng3c6+I4SyJ8
+      +Pm/RftcbR/71KeuBnm6DUS3XvZ/9tLwBU9KsvKW809pJKkD+gaAZ1JWCkV31kHr
+      DigGA+kgbm51nBDJYlpnOvBg+rdyLe9rJWmw8JUgqn64EQ8VoG0ylGmosSHa/nJR
+      kFHoQjGh/L40TGJgUxa+H0zu4AM6XehdnEKlAKEkUPdpEkMVtEXeqNKK7rSvp7MT
+      n1riJEc2ykZXDAFfaCgNWxgLzWKPrnFtE0Qh8A==
+      -----END CERTIFICATE-----
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: caring-oriole
+  name: caring-oriole.fe.lab
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: caring-oriole
+  template:
+    metadata:
+      labels:
+        app: caring-oriole
+    spec:
+      containers:
+      - image: gcr.io/kuar-demo/kuard-amd64:3
+        name: caring-oriole
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: caring-oriole
+  name: caring-oriole
+  namespace: default
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: caring-oriole
+  type: ClusterIP
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: caring-oriole.fe.lab
+  namespace: default
+spec:
+  host: caring-oriole.fe.lab
+  to:
+    kind: Service
+    name: caring-oriole
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Allow
+    key: |-
+      -----BEGIN PRIVATE KEY-----
+      MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC82zjArC1drur4
+      aOI2yFrzmSe0tdhiqwi3tm2Saw8SLB8UiK1Q2BBStsz3b6HRh8KyNOzRfa4D7nlR
+      Hpi1v01WZRKaLeOkd+TAFBbhApZyog4+T5LoMTmSuK+QthNJmKFlz/ckiWKmnZEA
+      mLmx5IAvrPXNCBQr3NhwDMiybFySQcWwbOcv+q4B7xwYoxurk6eFPoiQOq15Q6Vn
+      OThmaTHw25xBm5plzj31+73+m8fqIbWXHTK67bB+ETpluVlyBRz3TYQ+IJy0WRct
+      2z8nCUmjKfS0E+FyCwesCFotHaYuToZvwwn6zxOLaLDu/YKwHxsmEODoa5vgILN+
+      q1+nr3krAgMBAAECggEABEbChjpf3Js1XuKhHLR0usdhCsqDV9ifnelXmdUqxjKR
+      kZl2sznxRK42/fNdKq10Tyy7oBLEefpQbPHQa20lhytKvIsFeJfuahsKWZYBah8Z
+      S3fpz7AtqZDdCN3WmfgGz5Nh+UXTIgq3WdgbfFe8P1gfSMFCE6wwinj/omqpvfYN
+      UnFSpzPWmyqdnYvV8EfxVFkNPVshQ8L0WD32EgLbH6e3Pyk/Jh7qeZlz+xZDvSP0
+      Qsr8HI8FQvca8oBiIjmUdaduaM2j+w4yGtFvK05TPvrn5oCsBICrxKNKoOl8kyhv
+      sSJDPTL0PKrd4UmQFmcnS0s/a7kRJB8pgQ+0sldKwQKBgQDuS+nVKnDZ0Q/uHfK2
+      ++Zvyfj9DwbSMZ3YOj3FfcOc672EwfPWDGgv+gGM/95ySjlGifxPjTmQke4oDNEk
+      Q5YxO9CYxJamxjHpPZvkgwT2U2dyETiUZKmxTMES59hhRgcKiqvv9x04ARu7NRzb
+      e1GSvQk/1m+obJYtuUQJS/XlkwKBgQDK4wVL5K1l9VGW1d4GIeWFp4pGFi9Dqkih
+      JxBw1+0mLrgoQMccF31pq0GufKCOTzpOJWjW1jhLvdeHX+w9AwLQQ3EtrUhF2nTz
+      zSK4W05oeiuWZ2pkT4EILGDvmh/AT5vdm5w2Zf2DSDZwhji9SwPAkf4wxf9Ah3/k
+      RCjugExdCQKBgQDf8evA7u+7Y+QKrY5qNPVs3WzntXV9mC91A9cFgJmTIWCsIPIc
+      mPBZFiTa86OD2QlWp1q9EEWm/d3JObJa2EGP51y0FRxXgy9ouQOGjzLco6k148U+
+      gBORkkZolAYf9IWtfID1NVD6TuBW4SVLhus0cf79RXMN326Lbe7opcBjjQKBgQCC
+      t+xkroyuAXY0+cyYJOTNzVmAuLBxJ1iuRA4KtoR8MmPCw6HFzrimCYpDEtcbeZ52
+      VRIMQW96FXG1Li92S+dXKezU4i2LnCn4HvY8089b70MAH9djk/ntuzIljibg8Cnb
+      iXQHdIT3PeKdc01BYQCk5StiX1+LQwI6n1PD/vO0iQKBgBjL+F4sOp2kDAfi8CX6
+      rXVe/bu6E0FXUzk/ZU3x4Dp3uanS58tPKxqJ8yD3wZfCtgYqAtJ4xkViczGcSTpS
+      sV6Ly8PnOGt+x0JCLQ6BGzy7YnZ6wPdSoV9QkU6JLh2cwclZDtSa/1ZjCPqXpFvR
+      8HAZvU1J32HoV9oh7fwKKPyA
+      -----END PRIVATE KEY-----
+
+    certificate: |-
+      -----BEGIN CERTIFICATE-----
+      MIIDHDCCAgSgAwIBAgIQQrR9wrGgTRqYcyofXk6wKTANBgkqhkiG9w0BAQsFADAO
+      MQwwCgYDVQQDDANMQUIwHhcNMjIwMTA0MTEyNTU0WhcNMjQwNDA5MTEyNTU0WjAf
+      MR0wGwYDVQQDDBRjYXJpbmctb3Jpb2xlLmZlLmxhYjCCASIwDQYJKoZIhvcNAQEB
+      BQADggEPADCCAQoCggEBALzbOMCsLV2u6vho4jbIWvOZJ7S12GKrCLe2bZJrDxIs
+      HxSIrVDYEFK2zPdvodGHwrI07NF9rgPueVEemLW/TVZlEpot46R35MAUFuEClnKi
+      Dj5PkugxOZK4r5C2E0mYoWXP9ySJYqadkQCYubHkgC+s9c0IFCvc2HAMyLJsXJJB
+      xbBs5y/6rgHvHBijG6uTp4U+iJA6rXlDpWc5OGZpMfDbnEGbmmXOPfX7vf6bx+oh
+      tZcdMrrtsH4ROmW5WXIFHPdNhD4gnLRZFy3bPycJSaMp9LQT4XILB6wIWi0dpi5O
+      hm/DCfrPE4tosO79grAfGyYQ4Ohrm+Ags36rX6eveSsCAwEAAaNlMGMwHwYDVR0R
+      BBgwFoIUY2FyaW5nLW9yaW9sZS5mZS5sYWIwDgYDVR0PAQH/BAQDAgXgMA8GA1Ud
+      EwEB/wQFMAMBAf8wHwYDVR0jBBgwFoAUmZ7rbfvoJsn/YXhUgFPSn+V3pUMwDQYJ
+      KoZIhvcNAQELBQADggEBABeDmbZ7P2MtPTxoA68pgiJhS0HhKOYqX5v+VFmjKrMX
+      aG/K3dqed6gn/v9O14blYmVDTaQCYfKV4BBVco/Su43jhhuPpIyK0jIqGJOY+Uxy
+      A+Xnxvy6mpqGoYk6ATXTGfIYMjbrir+u1Yx/kvdRLx/daK/17QNuEZGGiSGDXfl6
+      qUNpIKjoepEw5XdnFmSfZKNdJqTD7PE7Rpo91MHJyrwGkeXLEnrwCrAMcdoHTsFo
+      yasUjpSOoWn5MqJfXgllI/gkL05+8XBzfBafVZaQinEDVGLA5H8XQQkHYxXQhARA
+      h/cQs8bK5adoHqCC3G/xOroI2uaZZqcXukPGjGUDXpQ=
+      -----END CERTIFICATE-----
